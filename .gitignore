@@ -1,0 +1,15 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+# ide
+/.idea
+
+# dependencies
+/.gradle
+
+# testing
+/coverage
+
+# production
+/build
+/out
+
