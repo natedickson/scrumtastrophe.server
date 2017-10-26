@@ -21,11 +21,15 @@ public class Game {
         return this.players.remove(player);
     }
 
+    private GameState gameState;
+    public GameState getGameState() { return gameState; }
+
     public Game(long id, Player owner) {
         this.id = id;
         this.owner = owner;
         this.players = new ArrayList<>();
         addPlayer(owner);
+        this.gameState = new GameState();
     }
 
 
