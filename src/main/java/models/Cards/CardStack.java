@@ -1,8 +1,9 @@
 package models.Cards;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class CardStack {
+public class CardStack implements Serializable{
     private ArrayList<Card> cards;
     public Card[] get() {
         int stackLength = cards.size();

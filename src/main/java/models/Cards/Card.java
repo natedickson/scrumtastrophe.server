@@ -1,6 +1,8 @@
 package models.Cards;
 
-public interface Card {
+import java.io.Serializable;
+
+public interface Card extends Serializable{
     String getName();
     String getDescription();
 }

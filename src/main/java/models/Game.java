@@ -1,5 +1,7 @@
 package models;
 
+import viewmodels.GameViewModel;
+
 import java.util.ArrayList;
 
 public class Game {
@@ -32,5 +34,11 @@ public class Game {
         this.gameState = new GameState();
     }
 
-
+    public GameViewModel getGameViewModel() {
+        GameViewModel gvm = new GameViewModel();
+        gvm.id = this.id;
+        gvm.owner = this.owner;
+        gvm.players = this.players;
+        return gvm;
+    }
 }
