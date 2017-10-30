@@ -39,6 +39,7 @@ public class Game {
         gvm.id = this.id;
         gvm.owner = this.owner;
         gvm.players = this.players;
+        gvm.gameStateCounter = this.gameState.getGameStateCounter();
         return gvm;
     }
 }

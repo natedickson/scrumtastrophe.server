@@ -6,13 +6,18 @@ import java.util.ArrayList;
 
 public class GameState {
     private CardStack deck;
+    private long gameStateCounter;
 
     public GameState() {
         deck = new CardStack(this.createDeck());
+        gameStateCounter = 0;
     }
 
     public CardStack getDeck() {
         return deck;
+    }
+    public long getGameStateCounter() {
+        return gameStateCounter;
     }
 
     private ArrayList<Card> createDeck() {

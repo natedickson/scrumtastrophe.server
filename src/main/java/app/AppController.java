@@ -6,8 +6,8 @@ import models.Player;
 import org.springframework.web.bind.annotation.*;
 import viewmodels.GameViewModel;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -25,14 +25,9 @@ public class AppController {
     //region Games
     @GetMapping("/games")
     @ResponseBody()
-    public ArrayList<Game> getGames() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public List<GameViewModel> getGames() {
         Log.that("getting list of games");
-        return gameList;
+        return gameList.stream().map(Game::getGameViewModel).filter(g -> g.gameStateCounter == 0).collect(Collectors.toList());
     }
 
     @PostMapping("/games/create")
@@ -49,17 +44,15 @@ public class AppController {
 
     @PatchMapping("/games/join")
     @ResponseBody()
-    public Game joinGameById(@RequestParam() Player player, @RequestParam() long gameId) {
+    public Game joinGameById(@RequestBody() long playerId, @RequestBody() long gameId) {
+        Player player = getPlayerById(playerId);
         Log.that(player.getName(), " requests to join game #", Long.toString(gameId));
         Game game = getGameById(gameId);
-        if (game != null) {
-            if (game.getPlayers().stream().anyMatch(p -> p.getName() ==  player.getName())) {
-                return null;
-            }
+        if (game != null && game.getGameState().getGameStateCounter() == 0) {
             game.addPlayer(player);
+            return game;
         }
-        return game;
-
+        return null;
     }
 
     @GetMapping("/game")
