@@ -4,6 +4,7 @@ import logging.Log;
 import models.Game;
 import models.Player;
 import org.springframework.web.bind.annotation.*;
+import postmodels.JoinGamePostModel;
 import viewmodels.GameViewModel;
 
 import java.util.*;
@@ -44,13 +45,15 @@ public class AppController {
 
     @PatchMapping("/games/join")
     @ResponseBody()
-    public Game joinGameById(@RequestBody() long playerId, @RequestBody() long gameId) {
+    public GameViewModel joinGameById(@RequestBody() JoinGamePostModel joinGamePostModel) {
+        long playerId = joinGamePostModel.playerId;
+        long gameId = joinGamePostModel.gameId;
         Player player = getPlayerById(playerId);
         Log.that(player.getName(), " requests to join game #", Long.toString(gameId));
         Game game = getGameById(gameId);
         if (game != null && game.getGameState().getGameStateCounter() == 0) {
             game.addPlayer(player);
-            return game;
+            return game.getGameViewModel();
         }
         return null;
     }
