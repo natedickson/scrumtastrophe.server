@@ -10,7 +10,7 @@ import viewmodels.GameViewModel;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 @RestController
 public class AppController {
 
