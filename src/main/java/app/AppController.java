@@ -93,6 +93,16 @@ public class AppController {
         return null;
     }
 
+    @PostMapping("/player/roles")
+    @ResponeBody()
+    public List<String> getPlayerRoles() {
+        Log.that("getting player roles");
+        List<String> playerRoles = new ArrayList<>();
+        playerRoles.add("QA");
+        playerRoles.add("DEV");
+        return playerRoles;
+    }
+
     @PostMapping("/player/create")
     @ResponseBody()
     public Player createPlayer(@RequestBody() PlayerCreatePost playerCreatePost) {
