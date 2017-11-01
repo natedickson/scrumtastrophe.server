@@ -93,7 +93,7 @@ public class AppController {
         return null;
     }
 
-    @PostMapping("/player/roles")
+    @GetMapping("/player/roles")
     @ResponseBody()
     public List<String> getPlayerRoles() {
         Log.that("getting player roles");
