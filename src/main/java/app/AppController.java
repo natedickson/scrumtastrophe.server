@@ -98,6 +98,8 @@ public class AppController {
     public List<Player> getPlayerRoles() {
         Log.that("getting player roles");
         List<Player> playerRoles = new ArrayList<Player>();
+        playerRoles.add(fromString.equals("QA"));
+        playerRoles.add(fromString.equals("DEV"));
         return playerRoles;
     }
 
