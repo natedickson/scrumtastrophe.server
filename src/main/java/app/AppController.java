@@ -95,11 +95,11 @@ public class AppController {
 
     @PostMapping("/player/roles")
     @ResponeBody()
-    public List<Player> getPlayerRoles() {
+    public List<String> getPlayerRoles() {
         Log.that("getting player roles");
-        List<Player> playerRoles = new ArrayList<Player>();
-        playerRoles.add(fromString.equals("QA"));
-        playerRoles.add(fromString.equals("DEV"));
+        List<String> playerRoles = new ArrayList<>();
+        playerRoles.add("QA");
+        playerRoles.add("DEV");
         return playerRoles;
     }
 
