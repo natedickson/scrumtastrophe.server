@@ -1,11 +1,11 @@
 package app;
 
+import enums.PlayerRole;
 import logging.Log;
-import models.Game;
-import models.Player;
+import models.Game.*;
+import models.GameState.*;
+import models.Player.*;
 import org.springframework.web.bind.annotation.*;
-import postmodels.JoinGamePostModel;
-import viewmodels.GameViewModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @RestController
 public class AppController {
 
-    private ArrayList<Game> gameList = new ArrayList<>();
-    private ArrayList<Player> playerList = new ArrayList<>();
+    private List<Game> gameList = new ArrayList<>();
+    private List<Player> playerList = new ArrayList<>();
     private long counter = 1;
 
     @RequestMapping("/")
@@ -26,14 +26,14 @@ public class AppController {
     //region Games
     @GetMapping("/games")
     @ResponseBody()
-    public List<GameViewModel> getGames() {
+    public List<GameView> getGames() {
         Log.that("getting list of games");
         return gameList.stream().map(Game::getGameViewModel).filter(g -> g.gameStateCounter == 0).collect(Collectors.toList());
     }
 
     @PostMapping("/games/create")
     @ResponseBody()
-    public GameViewModel createGame(@RequestBody() long playerId) {
+    public GameView createGame(@RequestBody() long playerId) {
         Log.that("creating a new game for player: ", Long.toString(playerId));
         Player player = getPlayerById(playerId);
         long gameId = counter++;
@@ -45,9 +45,9 @@ public class AppController {
 
     @PatchMapping("/games/join")
     @ResponseBody()
-    public GameViewModel joinGameById(@RequestBody() JoinGamePostModel joinGamePostModel) {
-        long playerId = joinGamePostModel.playerId;
-        long gameId = joinGamePostModel.gameId;
+    public GameView joinGameById(@RequestBody() GameJoinPost gameJoinPost) {
+        long playerId = gameJoinPost.playerId;
+        long gameId = gameJoinPost.gameId;
         Player player = getPlayerById(playerId);
         Log.that(player.getName(), " requests to join game #", Long.toString(gameId));
         Game game = getGameById(gameId);
@@ -60,19 +60,44 @@ public class AppController {
 
     @GetMapping("/game")
     @ResponseBody()
-    public Game getGameById(@RequestParam() long gameId) {
+    public Game getGameById(@RequestBody() long gameId) {
         Log.that("finding game with id #", Long.toString(gameId));
-        Optional<Game> foundGame = gameList.stream().filter(g -> g.getId() == gameId).findFirst();
-        if(foundGame.isPresent()) { return foundGame.get(); }
-        return null;
+        return gameList.stream().filter(g -> g.getId() == gameId).findFirst().orElse(null);
+        // .findFirst returns an Optional<Game>; .orElse allows us to give a default value when nothing is found
+    }
+
+    @GetMapping("/game/state/")
+    @ResponseBody()
+    public GameStateResponse getGameState(@RequestParam() long gameId, @RequestParam() long currentGameState) {
+        Log.that("getting game state for game #", Long.toString(gameId));
+        Game game = getGameById(gameId);
+        if(game == null) throw new IndexOutOfBoundsException("no game found.");
+
+        GameStateResponse response = new GameStateResponse();
+        response.updateHistory = new ArrayList<>();
+        GameState gameState = game.getGameState();
+        long trueGameState = gameState.getGameStateCounter();
+
+        if(currentGameState == trueGameState) return response;
+
+        if(currentGameState > trueGameState) throw new IllegalStateException("player at invalid state.");
+
+        response.gameState = trueGameState;
+        response.updateHistory.addAll(gameState.getHistory(currentGameState));
+        return response;
     }
     //endregion
+    private PlayerRole getPlayerRole(String fromString) {
+        if(fromString.equals("QA")) return PlayerRole.QA;
+        if(fromString.equals("DEV")) return PlayerRole.DEV;
+        return null;
+    }
 
     @PostMapping("/player/create")
     @ResponseBody()
-    public Player createPlayer(@RequestBody() String playerName) {
-        Log.that("creating player with name ", playerName);
-        Player player = new Player(counter++, playerName);
+    public Player createPlayer(@RequestBody() PlayerCreatePost playerCreatePost) {
+        Log.that("creating player with name ", playerCreatePost.name);
+        Player player = new Player(counter++, playerCreatePost.name, getPlayerRole(playerCreatePost.role));
         playerList.add(player);
         return player;
     }
@@ -81,8 +106,6 @@ public class AppController {
     @ResponseBody()
     public Player getPlayerById(@RequestBody() long playerId) {
         Log.that("finding player with id #", Long.toString(playerId));
-        Optional<Player> foundPlayer = playerList.stream().filter(g -> g.getId() == playerId).findFirst();
-        if(foundPlayer.isPresent()) { return foundPlayer.get(); }
-        return null;
+        return playerList.stream().filter(g -> g.getId() == playerId).findFirst().orElse(null);
     }
 }

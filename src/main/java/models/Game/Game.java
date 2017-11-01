@@ -1,8 +1,10 @@
-package models;
+package models.Game;
 
-import viewmodels.GameViewModel;
+import models.GameState.GameState;
+import models.Player.Player;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Game {
     private final long id;
@@ -14,8 +16,8 @@ public class Game {
     public Player getOwner() { return  owner; }
     public void setOwner(Player newOwner) { this.owner = newOwner; }
 
-    private ArrayList<Player> players;
-    public ArrayList<Player> getPlayers() {
+    private List<Player> players;
+    public List<Player> getPlayers() {
         return players;
     }
     public void addPlayer(Player newPlayer) { this.players.add(newPlayer); }
@@ -34,8 +36,8 @@ public class Game {
         this.gameState = new GameState();
     }
 
-    public GameViewModel getGameViewModel() {
-        GameViewModel gvm = new GameViewModel();
+    public GameView getGameViewModel() {
+        GameView gvm = new GameView();
         gvm.id = this.id;
         gvm.owner = this.owner;
         gvm.players = this.players;

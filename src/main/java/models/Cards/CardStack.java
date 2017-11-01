@@ -1,10 +1,10 @@
 package models.Cards;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 public class CardStack implements Serializable{
-    private ArrayList<Card> cards;
+    private List<Card> cards;
     public Card[] get() {
         int stackLength = cards.size();
         Card[] currentCards = new Card[stackLength];
@@ -21,9 +21,9 @@ public class CardStack implements Serializable{
     }
 
     public CardStack() {
-        this(new ArrayList<>());
+        this(new List<>());
     }
-    public CardStack(ArrayList<Card> startingCards) {
+    public CardStack(List<Card> startingCards) {
         this.cards = startingCards;
     }
 }

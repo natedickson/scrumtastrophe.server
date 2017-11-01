@@ -1,6 +1,6 @@
-package postmodels;
+package models.Game;
 
-public class JoinGamePostModel {
+public class GameJoinPost {
     public long playerId;
     public long gameId;
 }
