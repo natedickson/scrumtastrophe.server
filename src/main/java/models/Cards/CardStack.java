@@ -1,6 +1,7 @@
 package models.Cards;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CardStack implements Serializable{
@@ -21,7 +22,7 @@ public class CardStack implements Serializable{
     }
 
     public CardStack() {
-        this(new List<>());
+        this(new ArrayList<>());
     }
     public CardStack(List<Card> startingCards) {
         this.cards = startingCards;

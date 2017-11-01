@@ -94,7 +94,7 @@ public class AppController {
     }
 
     @PostMapping("/player/roles")
-    @ResponeBody()
+    @ResponseBody()
     public List<String> getPlayerRoles() {
         Log.that("getting player roles");
         List<String> playerRoles = new ArrayList<>();
