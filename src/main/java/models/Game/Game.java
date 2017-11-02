@@ -28,12 +28,13 @@ public class Game {
     private GameState gameState;
     public GameState getGameState() { return gameState; }
 
+
     public Game(long id, Player owner) {
         this.id = id;
         this.owner = owner;
         this.players = new ArrayList<>();
         addPlayer(owner);
-        this.gameState = new GameState();
+        this.gameState = new GameState(players);
     }
 
     public GameView getGameViewModel() {
@@ -41,7 +42,6 @@ public class Game {
         gvm.id = this.id;
         gvm.owner = this.owner;
         gvm.players = this.players;
-        gvm.gameStateCounter = this.gameState.getGameStateCounter();
         return gvm;
     }
 }

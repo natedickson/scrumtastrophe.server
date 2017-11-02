@@ -5,6 +5,7 @@ import logging.Log;
 import models.Game.*;
 import models.GameState.*;
 import models.Player.*;
+import models.PlayerState.PlayerState;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class AppController {
     @ResponseBody()
     public List<GameView> getGames() {
         Log.that("getting list of games");
-        return gameList.stream().map(Game::getGameViewModel).filter(g -> g.gameStateCounter == 0).collect(Collectors.toList());
+        return gameList.stream().filter(g -> g.getGameState().getGameStateCounter() == 0).map(Game::getGameViewModel).collect(Collectors.toList());
     }
 
     @PostMapping("/games/create")
@@ -36,6 +37,7 @@ public class AppController {
     public GameView createGame(@RequestBody() long playerId) {
         Log.that("creating a new game for player: ", Long.toString(playerId));
         Player player = getPlayerById(playerId);
+        Log.that("found player by name: ", player.getName());
         long gameId = counter++;
         player.setGameId(gameId);
         Game newGame = new Game(gameId, player);
@@ -53,6 +55,8 @@ public class AppController {
         Game game = getGameById(gameId);
         if (game != null && game.getGameState().getGameStateCounter() == 0) {
             game.addPlayer(player);
+            game.getGameState().addGamePlayer(new PlayerState(player.getId(),player.getName(),player.getRole()));
+            player.setGameId(gameId);
             return game.getGameViewModel();
         }
         return null;
@@ -66,9 +70,9 @@ public class AppController {
         // .findFirst returns an Optional<Game>; .orElse allows us to give a default value when nothing is found
     }
 
-    @GetMapping("/game/state/")
+    @GetMapping("/game/state/update")
     @ResponseBody()
-    public GameStateResponse getGameState(@RequestParam() long gameId, @RequestParam() long currentGameState) {
+    public GameStateResponse getGameStateUpdates(@RequestParam() long gameId, @RequestParam() long playerId, @RequestParam() long currentGameState) {
         Log.that("getting game state for game #", Long.toString(gameId));
         Game game = getGameById(gameId);
         if(game == null) throw new IndexOutOfBoundsException("no game found.");
@@ -85,6 +89,18 @@ public class AppController {
         response.gameState = trueGameState;
         response.updateHistory.addAll(gameState.getHistory(currentGameState));
         return response;
+    }
+
+    @GetMapping("/game/state")
+    @ResponseBody()
+    public GameStateView getGameState(@RequestParam() long gameId, @RequestParam() long playerId) {
+        Player player = getPlayerById(playerId);
+        Log.that( "getting initial state for game #", Long.toString(gameId), "for player ", player.getName());
+        Game game = getGameById(gameId);
+        if(game == null) throw new IndexOutOfBoundsException("no game found.");
+
+        GameState state = game.getGameState();
+        return state.getGameStateView(playerId);
     }
     //endregion
     private PlayerRole getPlayerRole(String fromString) {
