@@ -47,7 +47,7 @@ public class AppController {
 
     @PatchMapping("/games/join")
     @ResponseBody()
-    public GameView joinGameById(@RequestBody() GameJoinPost gameJoinPost) {
+    public GameView joinGameById(@RequestBody() PlayerGameContext gameJoinPost) {
         long playerId = gameJoinPost.playerId;
         long gameId = gameJoinPost.gameId;
         Player player = getPlayerById(playerId);
@@ -65,7 +65,6 @@ public class AppController {
     @GetMapping("/game")
     @ResponseBody()
     public Game getGameById(@RequestBody() long gameId) {
-        Log.that("finding game with id #", Long.toString(gameId));
         return gameList.stream().filter(g -> g.getId() == gameId).findFirst().orElse(null);
         // .findFirst returns an Optional<Game>; .orElse allows us to give a default value when nothing is found
     }
@@ -94,7 +93,6 @@ public class AppController {
     @GetMapping("/game/state")
     @ResponseBody()
     public GameStateView getGameState(@RequestParam() long gameId, @RequestParam() long playerId) {
-        Log.that( "getting initial state for game #", Long.toString(gameId), " for player ", Long.toString(playerId));
         Game game = getGameById(gameId);
         if(game == null) throw new IndexOutOfBoundsException("no game found.");
 
@@ -121,12 +119,13 @@ public class AppController {
     }
 
     //endregion
+
+    //region Player
     private PlayerRole getPlayerRole(String fromString) {
         if(fromString.equals("QA")) return PlayerRole.QA;
         if(fromString.equals("DEV")) return PlayerRole.DEV;
         return null;
     }
-
     @GetMapping("/player/roles")
     @ResponseBody()
     public List<String> getPlayerRoles() {
@@ -152,4 +151,13 @@ public class AppController {
         Log.that("finding player with id #", Long.toString(playerId));
         return playerList.stream().filter(g -> g.getId() == playerId).findFirst().orElse(null);
     }
+    //endregion
+
+    //region Action
+    @PostMapping("/action/beginGame")
+    public void actionBeginGame(@RequestBody() PlayerGameContext context) {
+        Log.that("beginning game #", Long.toString(context.gameId));
+        getGameById(context.gameId).getGameState().beginGame();
+    }
+    //endregion
 }

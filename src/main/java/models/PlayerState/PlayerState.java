@@ -15,6 +15,10 @@ public class PlayerState {
         this.availableLoad = 0;
     }
 
+    public PlayerStateView getPlayerStateView() {
+        return new PlayerStateView(this.id, this.name, this.role, this.availableLoad);
+    }
+
     public long getId() {
         return id;
     }
