@@ -94,8 +94,7 @@ public class AppController {
     @GetMapping("/game/state")
     @ResponseBody()
     public GameStateView getGameState(@RequestParam() long gameId, @RequestParam() long playerId) {
-        Player player = getPlayerById(playerId);
-        Log.that( "getting initial state for game #", Long.toString(gameId), "for player ", player.getName());
+        Log.that( "getting initial state for game #", Long.toString(gameId), " for player ", Long.toString(playerId));
         Game game = getGameById(gameId);
         if(game == null) throw new IndexOutOfBoundsException("no game found.");
 
