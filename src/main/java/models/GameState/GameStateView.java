@@ -8,5 +8,5 @@ public class GameStateView {
     public long currentState;
     public List<PlayerStateView> playerSummaries;
     public int availableLoad;
-
+    public List<String> chatMessages;
 }

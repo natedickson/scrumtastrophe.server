@@ -102,6 +102,25 @@ public class AppController {
         GameState state = game.getGameState();
         return state.getGameStateView(playerId);
     }
+
+    @PostMapping("/game/chat")
+    @ResponseBody()
+    public List<String> sendChatMessage(@RequestBody() ChatPost chatObj){
+        Player player = getPlayerById(chatObj.playerId);
+        Log.that("send chat message of ", chatObj.message,
+                "for game #", Long.toString(chatObj.gameId),
+                "for player ", player.getName());
+        Game game = getGameById(chatObj.gameId);
+        if(game == null){
+            throw new IndexOutOfBoundsException("no game found.");
+        }
+
+        GameState state = game.getGameState();
+        String message = player.getName() + ": " + chatObj.message;
+        state.addChatMessage(message);
+        return state.getRecentChatMessages();
+    }
+
     //endregion
     private PlayerRole getPlayerRole(String fromString) {
         if(fromString.equals("QA")) return PlayerRole.QA;
