@@ -43,7 +43,7 @@ public class GameState {
     }
 
     public void addGamePlayer(PlayerState playerState) {
-        storeHistory("addGamePlayer");
+//        storeHistory("addGamePlayer");
         this.playerStates.add(playerState);
     }
 
