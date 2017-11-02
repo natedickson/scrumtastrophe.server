@@ -25,6 +25,16 @@ public class GameState {
         history.add((int)gameStateCounter, update);
     }
 
+    private List<String> chatLog;
+    public void addChatMessage(String message){
+        this.chatLog.add(message);
+    }
+    public List<String> getRecentChatMessages(){
+        return this.chatLog.size() < 10 ?
+                this.chatLog :
+                this.chatLog.subList(chatLog.size() - 10, chatLog.size());
+    }
+
     private List<PlayerState> playerStates;
 
     public GameState(List<Player> players) {
@@ -32,6 +42,7 @@ public class GameState {
         gameStateCounter = 0;
         history = new ArrayList<>();
         history.add("init");
+        chatLog = new ArrayList<>();
         playerStates = players.stream().map((player) -> {
             PlayerState ps = new PlayerState(player.getId(), player.getName(), player.getRole());
             return ps;
@@ -52,6 +63,8 @@ public class GameState {
         gsv.currentState = gameStateCounter;
         gsv.playerSummaries = new ArrayList<>();
         gsv.availableLoad = 0;
+        gsv.chatMessages = getRecentChatMessages();
+
         for(PlayerState player : playerStates) {
             PlayerStateView psv = new PlayerStateView();
             psv.availableLoad = player.getAvailableLoad();
