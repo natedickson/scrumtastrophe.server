@@ -2,6 +2,7 @@ package app;
 
 import enums.PlayerRole;
 import logging.Log;
+import models.Chat.ChatPost;
 import models.Game.*;
 import models.GameState.*;
 import models.Player.*;

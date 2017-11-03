@@ -1,4 +1,4 @@
-package models.Game;
+package models.Chat;
 
 public class ChatPost {
     public long playerId;

@@ -1,5 +1,6 @@
 package models.GameState;
 
+import models.Action.Action;
 import models.PlayerState.PlayerStateView;
 import models.StoryState.StoryStateView;
 
@@ -11,4 +12,5 @@ public class GameStateView {
     public int availableLoad;
     public List<String> chatMessages;
     public List<StoryStateView> sprintStories;
+    public List<Action> availableActions;
 }

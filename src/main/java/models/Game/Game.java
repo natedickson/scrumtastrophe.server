@@ -34,7 +34,7 @@ public class Game {
         this.owner = owner;
         this.players = new ArrayList<>();
         addPlayer(owner);
-        this.gameState = new GameState(players);
+        this.gameState = new GameState(owner);
     }
 
     public GameView getGameViewModel() {

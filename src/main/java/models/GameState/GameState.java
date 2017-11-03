@@ -1,7 +1,7 @@
 package models.GameState;
 
 //import models.Cards.*;
-import models.StoryState.StoryStateView;
+import models.Action.Action;
 import roller.Roll;
 
 import models.Player.Player;
@@ -10,7 +10,6 @@ import models.StoryState.StoryState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 public class GameState {
@@ -45,17 +44,21 @@ public class GameState {
     private List<StoryState> sprintStories;
     private List<StoryState> successfullyReleased;
 
-    public GameState(List<Player> players) {
+    public GameState(Player owner) {
 //        deck = new CardStack(this.createDeck());
         storyIdCounter = 1;
         gameStateCounter = 0;
         history = new ArrayList<>();
         history.add("init");
         chatLog = new ArrayList<>();
-        playerStates = players.stream().map((player) -> {
-            PlayerState ps = new PlayerState(player.getId(), player.getName(), player.getRole());
-            return ps;
-        }).collect(Collectors.toList());
+        playerStates = new ArrayList<>();
+        PlayerState ownersState = new PlayerState(owner.getId(), owner.getName(), owner.getRole());
+        ownersState.addAvailableAction(new Action("Start Game", "beginGame", ""));
+        playerStates.add(ownersState);
+        generatedBacklog = new ArrayList<>();
+        sprintStories = new ArrayList<>();
+        successfullyReleased = new ArrayList<>();
+        beginGame();
     }
 
     public List<PlayerState> getPlayerStates() {
@@ -68,7 +71,9 @@ public class GameState {
     }
 
     public void beginGame() {
-        this.generatedBacklog = generateBacklog(playerStates.size() * 10); //10 times # players is the perfect amount
+        this.generatedBacklog.addAll(generateBacklog(playerStates.size() * 10)); //10 times # players is the perfect amount
+        //Ideally then the players would pick which stories to pull in, but for now we'll give them the first 10;
+        this.sprintStories = generatedBacklog.subList(0,10);
     }
 
     public GameStateView getGameStateView(long playerId) {
@@ -82,7 +87,10 @@ public class GameState {
         for(PlayerState player : playerStates) {
             PlayerStateView psv = player.getPlayerStateView();
             gsv.playerSummaries.add(psv);
-            if(playerId == psv.id) gsv.availableLoad = psv.availableLoad;
+            if(playerId == psv.id) {
+                gsv.availableLoad = psv.availableLoad;
+                gsv.availableActions = player.getAvailableActions();
+            }
         }
         for(StoryState story : sprintStories) {
             gsv.sprintStories.add(story.getStoryStateView());
