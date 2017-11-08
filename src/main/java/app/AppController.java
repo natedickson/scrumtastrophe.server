@@ -24,7 +24,6 @@ public class AppController {
     public String index() {
         return "Server init complete";
     }
-
     //region Games
     @GetMapping("/games")
     @ResponseBody()
