@@ -20,4 +20,11 @@ public class StoryState {
     public StoryStateView getStoryStateView() {
         return new StoryStateView(id, inProgress, dev, cr, qa);
     }
+
+    public String getProgress() {
+        if(dev > 0) return "dev";
+        if(cr > 0) return "cr";
+        if(qa > 0) return "qa";
+        return "complete";
+    }
 }

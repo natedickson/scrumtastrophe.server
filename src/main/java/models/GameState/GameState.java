@@ -8,8 +8,11 @@ import models.Player.Player;
 import models.PlayerState.*;
 import models.StoryState.StoryState;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class GameState {
@@ -39,9 +42,9 @@ public class GameState {
                 this.chatLog.subList(chatLog.size() - 10, chatLog.size());
     }
 
-    private List<PlayerState> playerStates;
+    private Map<Long,PlayerState> playerStates;
     private List<StoryState> generatedBacklog;
-    private List<StoryState> sprintStories;
+    private Map<Long,StoryState> sprintStories;
     private List<StoryState> successfullyReleased;
 
     public GameState(Player owner) {
@@ -51,57 +54,56 @@ public class GameState {
         history = new ArrayList<>();
         history.add("init");
         chatLog = new ArrayList<>();
-        playerStates = new ArrayList<>();
+        playerStates = new HashMap<>();
         PlayerState ownersState = new PlayerState(owner.getId(), owner.getName(), owner.getRole());
         ownersState.addAvailableAction(new Action("Start Game", "beginGame", ""));
-        playerStates.add(ownersState);
+        playerStates.put(owner.getId(), ownersState);
         generatedBacklog = new ArrayList<>();
-        sprintStories = new ArrayList<>();
+        sprintStories = new HashMap<>();
         successfullyReleased = new ArrayList<>();
-        beginGame();
     }
 
-    public List<PlayerState> getPlayerStates() {
+    public Map<Long, PlayerState> getPlayerStates() {
         return playerStates;
     }
+    public PlayerState getPlayerStateById(long id) {
+        return playerStates.get(id);
+    }
+    public StoryState getStoryStateById(long id) { return sprintStories.get(id); }
 
     public void addGamePlayer(PlayerState playerState) {
 //        storeHistory("addGamePlayer");
-        this.playerStates.add(playerState);
+        this.playerStates.put(playerState.getId(), playerState);
     }
 
     public void beginGame() {
         this.generatedBacklog.addAll(generateBacklog(playerStates.size() * 10)); //10 times # players is the perfect amount
         //Ideally then the players would pick which stories to pull in, but for now we'll give them the first 10;
-        this.sprintStories = generatedBacklog.subList(0,10);
+        for(StoryState story : this.generatedBacklog.subList(0,10)) {
+            this.sprintStories.put(story.id, story);
+        }
+        this.playerStates.forEach((id,ps) -> {
+            ps.addAvailableAction(new Action("Roll for Load", "rollLoad", ""));
+        });
+        gameStateCounter++;
     }
 
     public GameStateView getGameStateView(long playerId) {
         GameStateView gsv = new GameStateView();
         gsv.currentState = gameStateCounter;
-        gsv.playerSummaries = new ArrayList<>();
-        gsv.sprintStories = new ArrayList<>();
-        gsv.availableLoad = 0;
+        gsv.playerSummaries = playerStates.values().stream().map(PlayerState::getPlayerStateView).collect(Collectors.toList());
+        gsv.sprintStories = sprintStories.values().stream().map(StoryState::getStoryStateView).collect(Collectors.toList());
         gsv.chatMessages = getRecentChatMessages();
-
-        for(PlayerState player : playerStates) {
-            PlayerStateView psv = player.getPlayerStateView();
-            gsv.playerSummaries.add(psv);
-            if(playerId == psv.id) {
-                gsv.availableLoad = psv.availableLoad;
-                gsv.availableActions = player.getAvailableActions();
-            }
-        }
-        for(StoryState story : sprintStories) {
-            gsv.sprintStories.add(story.getStoryStateView());
-        }
+        PlayerState player = playerStates.get(playerId);
+        gsv.availableLoad = player.getAvailableLoad();
+        gsv.availableActions = player.getAvailableActions();
         return gsv;
     }
 
     private List<StoryState> generateBacklog(int total) {
         List<StoryState> stories = new ArrayList<>();
         for(int i=0; i<total; i++) {
-            StoryState story = new StoryState(storyIdCounter++, "StoryTitle", Roll.from(5,10), Roll.from(5,10));
+            StoryState story = new StoryState(storyIdCounter++, "StoryTitle", Roll.from(1,5), Roll.from(1,5));
             stories.add(story);
         }
         return stories;

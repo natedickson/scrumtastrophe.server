@@ -11,6 +11,8 @@ public class PlayerState {
     private String name;
     private PlayerRole role;
     private int availableLoad;
+    private int minLoad;
+    private int maxLoad;
     private List<Action> availableActions;
 
     public PlayerState(long id, String name, PlayerRole role) {
@@ -18,6 +20,8 @@ public class PlayerState {
         this.name = name;
         this.role = role;
         this.availableLoad = 0;
+        this.minLoad = 1;
+        this.maxLoad = 4;
         this.availableActions = new ArrayList<>();
     }
 
@@ -37,8 +41,20 @@ public class PlayerState {
         return role;
     }
 
+    public void setAvailableLoad(int availableLoad) {
+        this.availableLoad = availableLoad;
+    }
+
     public int getAvailableLoad() {
         return availableLoad;
+    }
+
+    public int getMaxLoad() {
+        return maxLoad;
+    }
+
+    public int getMinLoad() {
+        return minLoad;
     }
 
     public List<Action> getAvailableActions() {
@@ -47,8 +63,8 @@ public class PlayerState {
     public void addAvailableAction(Action action) {
         availableActions.add(action);
     }
-    public void removeAvailableAction(String actionLabel) {
-        Action toRemove = availableActions.stream().filter((action) -> action.label.equals(actionLabel)).findFirst().orElse(null);
+    public void removeAvailableAction(String actionToRemove) {
+        Action toRemove = availableActions.stream().filter((action) -> action.action.equals(actionToRemove)).findFirst().orElse(null);
         if(toRemove == null) {
             return;
         }
