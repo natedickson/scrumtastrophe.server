@@ -70,4 +70,7 @@ public class PlayerState {
         }
         availableActions.remove(toRemove);
     }
+    public boolean hasAvailableActions() {
+        return availableActions.size() > 0;
+    }
 }

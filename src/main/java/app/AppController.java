@@ -38,9 +38,8 @@ public class AppController {
     @PostMapping("/games/create")
     @ResponseBody()
     public GameView createGame(@RequestBody() long playerId) {
-        Log.that("creating a new game for player: ", Long.toString(playerId));
         Player player = playerList.get(playerId);
-        Log.that("found player by name: ", player.getName());
+        Log.that("creating a new game for player: ", player.getName());
         long gameId = counter++;
         player.setGameId(gameId);
         Game newGame = new Game(gameId, player);
@@ -212,6 +211,7 @@ public class AppController {
         }
         story.inProgress = true;
         if(player.getAvailableLoad() <= 0) player.removeAvailableAction("spendLoad");
+        if(!gameState.anyAvailablePlayerActions()) gameState.beginNextTurn();
     }
 
     private boolean validateAction(PlayerState player, String forAction) {

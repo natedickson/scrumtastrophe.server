@@ -70,6 +70,9 @@ public class GameState {
         return playerStates.get(id);
     }
     public StoryState getStoryStateById(long id) { return sprintStories.get(id); }
+    public boolean anyAvailablePlayerActions() {
+        return playerStates.values().stream().anyMatch(PlayerState::hasAvailableActions);
+    }
 
     public void addGamePlayer(PlayerState playerState) {
 //        storeHistory("addGamePlayer");
@@ -83,6 +86,14 @@ public class GameState {
             this.sprintStories.put(story.id, story);
         }
         this.playerStates.forEach((id,ps) -> {
+            ps.addAvailableAction(new Action("Roll for Load", "rollLoad", ""));
+        });
+        gameStateCounter++;
+    }
+
+    public void beginNextTurn() {
+        this.playerStates.forEach((id,ps) -> {
+            ps.setAvailableLoad(0);
             ps.addAvailableAction(new Action("Roll for Load", "rollLoad", ""));
         });
         gameStateCounter++;
